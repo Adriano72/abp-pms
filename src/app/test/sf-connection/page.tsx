@@ -1,14 +1,26 @@
 import { salesforceRequest } from '@/lib/salesforce'
 
+type SObjectInfo = {
+  name: string
+  label: string
+}
+
+type SObjectResponse = {
+  sobjects: SObjectInfo[]
+}
+
 export default async function Page() {
-  let data: any = null
+  let data: SObjectResponse | null = null
   let error: string | null = null
 
   try {
-    // Recupera la lista degli oggetti disponibili in Salesforce
-    data = await salesforceRequest('/sobjects')
-  } catch (err: any) {
-    error = err.message || 'Unknown error'
+    data = await salesforceRequest<SObjectResponse>('/sobjects')
+  } catch (err) {
+    if (err instanceof Error) {
+      error = err.message
+    } else {
+      error = 'Unknown error'
+    }
   }
 
   return (
@@ -24,7 +36,7 @@ export default async function Page() {
         <div className="bg-green-100 text-green-900 p-4 rounded">
           <p className="font-semibold mb-2">✅ Connected! Available objects:</p>
           <pre className="text-sm whitespace-pre-wrap">
-            {JSON.stringify(data?.sobjects?.slice(0, 5), null, 2)}
+            {JSON.stringify(data?.sobjects.slice(0, 5), null, 2)}
           </pre>
         </div>
       )}

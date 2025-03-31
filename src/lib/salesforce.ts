@@ -24,7 +24,7 @@ async function authenticateWithSalesforce() {
     throw new Error('Failed to authenticate with Salesforce')
   }
 
-  const data = await res.json()
+  const data: { access_token: string; instance_url: string } = await res.json()
   cachedAccessToken = data.access_token
   cachedInstanceUrl = data.instance_url
 }
@@ -61,5 +61,5 @@ export async function salesforceRequest<T = any>(
     throw new Error(`Salesforce API request failed: ${res.statusText}`)
   }
 
-  return res.json()
+  return res.json() as Promise<T>
 }

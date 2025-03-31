@@ -2,11 +2,18 @@
 
 import { useState } from 'react'
 
+type EventRegistration = {
+  Id: string
+  Event_Name__r?: { Name: string }
+  Registration_Type__c?: string
+  CreatedDate: string
+}
+
 export default function EventRegistrationSearchPage() {
-  const [email, setEmail] = useState('')
-  const [results, setResults] = useState<any[]>([])
+  const [email, setEmail] = useState<string>('')
+  const [results, setResults] = useState<EventRegistration[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
   async function handleSearch() {
     setLoading(true)
@@ -16,10 +23,14 @@ export default function EventRegistrationSearchPage() {
     try {
       const res = await fetch(`/api/search-event-registrations?email=${encodeURIComponent(email)}`)
       if (!res.ok) throw new Error(await res.text())
-      const data = await res.json()
+      const data: EventRegistration[] = await res.json()
       setResults(data)
-    } catch (err: any) {
-      setError(err.message || 'Unknown error')
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Unknown error')
+      }
     } finally {
       setLoading(false)
     }
@@ -52,17 +63,16 @@ export default function EventRegistrationSearchPage() {
       )}
 
       {results.length > 0 && (
-  <ul className="mt-6 bg-white border border-green-200 p-4 rounded space-y-3 text-sm text-gray-800 shadow-sm">
-    {results.map((r, i) => (
-      <li key={i}>
-        <p><strong>📛 Event:</strong> {r.Event_Name__r?.Name || 'N/A'}</p>
-        <p><strong>🎫 Type:</strong> {r.Registration_Type__c || 'N/A'}</p>
-        <p><strong>📅 Created:</strong> {new Date(r.CreatedDate).toLocaleString()}</p>
-      </li>
-    ))}
-  </ul>
-)}
-
+        <ul className="mt-6 bg-white border border-green-200 p-4 rounded space-y-3 text-sm text-gray-800 shadow-sm">
+          {results.map((r) => (
+            <li key={r.Id}>
+              <p><strong>📛 Event:</strong> {r.Event_Name__r?.Name || 'N/A'}</p>
+              <p><strong>🎫 Type:</strong> {r.Registration_Type__c || 'N/A'}</p>
+              <p><strong>📅 Created:</strong> {new Date(r.CreatedDate).toLocaleString()}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

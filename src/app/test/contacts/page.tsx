@@ -1,7 +1,15 @@
 import { salesforceRequest } from '@/lib/salesforce'
 
 export default async function Page() {
-  let contacts: any[] = []
+    type Contact = {
+        Id: string
+        FirstName?: string
+        LastName?: string
+        Email?: string
+      }
+      
+      let contacts: Contact[] = []
+      
   let error: string | null = null
 
   try {

@@ -14,8 +14,10 @@ export async function GET(req: Request) {
     const contactQuery = `
       SELECT Id FROM Contact WHERE Email = '${email}' LIMIT 1
     `
-    const contactRes = await salesforceRequest(`/query?q=${encodeURIComponent(contactQuery)}`)
+    type ContactQueryResponse = { records: { Id: string }[] }
+    const contactRes = await salesforceRequest<ContactQueryResponse>(`/query?q=${encodeURIComponent(contactQuery)}`)
     const contact = contactRes.records[0]
+
 
     if (!contact) {
       return NextResponse.json([], { status: 200 })
