@@ -3,7 +3,7 @@ const TOKEN_URL = `${process.env.SALESFORCE_LOGIN_URL}/services/oauth2/token`
 let cachedAccessToken: string | null = null
 let cachedInstanceUrl: string | null = null
 
-async function authenticateWithSalesforce() {
+async function authenticateWithSalesforce(): Promise<void> {
   const res = await fetch(TOKEN_URL, {
     method: 'POST',
     headers: {
@@ -24,15 +24,19 @@ async function authenticateWithSalesforce() {
     throw new Error('Failed to authenticate with Salesforce')
   }
 
-  const data: { access_token: string; instance_url: string } = await res.json()
+  const data: {
+    access_token: string
+    instance_url: string
+  } = await res.json()
+
   cachedAccessToken = data.access_token
   cachedInstanceUrl = data.instance_url
 }
 
-export async function salesforceRequest<T = any>(
+export async function salesforceRequest<T = unknown>(
   path: string,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
-  body?: Record<string, any>
+  body?: Record<string, unknown>
 ): Promise<T> {
   if (!cachedAccessToken || !cachedInstanceUrl) {
     await authenticateWithSalesforce()
