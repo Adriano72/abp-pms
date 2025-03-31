@@ -46,7 +46,6 @@ export async function GET(req: Request) {
     return NextResponse.json(registrationRes.records)
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error'
-    console.error(error)
     return NextResponse.json({ error }, { status: 500 })
   }
 }
